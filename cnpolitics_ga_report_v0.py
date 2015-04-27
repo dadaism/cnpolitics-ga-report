@@ -41,10 +41,9 @@ understands by running:
   $ python hello_analytics_api_v3.py --help
 """
 
-__author__ = 'api.nickm@gmail.com (Nick Mihailovski)'
-
 import argparse
 import sys
+import cnpolitics_ga_report_v0
 
 from apiclient.errors import HttpError
 from apiclient import sample_tools
@@ -52,6 +51,7 @@ from oauth2client.client import AccessTokenRefreshError
 
 
 def main(argv):
+  # service = cnpolitics_ga_report_v0.initialize_service()
   # Authenticate and construct service.
   service, flags = sample_tools.init(
       argv, 'analytics', 'v3', __doc__, __file__,
