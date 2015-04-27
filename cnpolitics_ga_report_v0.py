@@ -43,7 +43,7 @@ understands by running:
 
 import argparse
 import sys
-import cnpolitics_ga_report_v0
+import cnpolitics_ga_report_v0_auth
 
 from apiclient.errors import HttpError
 from apiclient import sample_tools
@@ -51,11 +51,11 @@ from oauth2client.client import AccessTokenRefreshError
 
 
 def main(argv):
-  # service = cnpolitics_ga_report_v0.initialize_service()
+  service = cnpolitics_ga_report_v0_auth.initialize_service()
   # Authenticate and construct service.
-  service, flags = sample_tools.init(
-      argv, 'analytics', 'v3', __doc__, __file__,
-      scope='https://www.googleapis.com/auth/analytics.readonly')
+  #service, flags = sample_tools.init(
+  #    argv, 'analytics', 'v3', __doc__, __file__,
+  #    scope='https://www.googleapis.com/auth/analytics.readonly')
 
   # Try to make a request to the API. Print the results or handle errors.
   try:
@@ -100,7 +100,7 @@ def get_first_profile_id(service):
   accounts = service.management().accounts().list().execute()
 
   if accounts.get('items'):
-    firstAccountId = accounts.get('items')[0].get('id')
+    firstAccountId = accounts.get('items')[1].get('id')       # get the nth item
     webproperties = service.management().webproperties().list(
         accountId=firstAccountId).execute()
 
@@ -132,7 +132,7 @@ def get_top_keywords(service, profile_id):
   return service.data().ga().get(
       ids='ga:' + profile_id,
       start_date='2015-01-01',
-      end_date='2015-03-15',
+      end_date='2015-04-15',
       metrics='ga:visits',
       dimensions='ga:source,ga:keyword',
       sort='-ga:visits',
