@@ -133,7 +133,7 @@ def get_top_keywords(service, profile_id):
       ids='ga:' + profile_id,
       start_date='2015-01-01',
       end_date='2015-04-15',
-      metrics='ga:visits',
+      metrics='ga:visits,ga:pageviews,ga:sessions',
       dimensions='ga:source,ga:keyword',
       sort='-ga:visits',
       filters='ga:medium==organic',
