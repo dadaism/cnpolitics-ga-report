@@ -44,6 +44,7 @@ understands by running:
 import argparse
 import sys
 import cnpolitics_ga_report_v0_auth
+import utility
 
 from apiclient.errors import HttpError
 from apiclient import sample_tools
@@ -66,6 +67,7 @@ def main(argv):
 
       results = get_top_pageviews(service, cnpolitics_profile_id)
       print_pageview_results(results)
+      #print_results(results)
 
       results = get_top_continents(service, cnpolitics_profile_id)
       print_results(results)
@@ -151,7 +153,7 @@ def get_top_keywords(service, profile_id):
   return service.data().ga().get(
       ids='ga:' + profile_id,
       start_date='2015-04-01',
-      end_date='2015-04-28',
+      end_date='2015-05-18',
       metrics='ga:visits,ga:sessions',
       dimensions='ga:source,ga:keyword',
       sort='-ga:visits',
@@ -171,11 +173,13 @@ def get_top_pageviews(service, profile_id):
   Returns:
     The response returned from the Core Reporting API.
   """
+  s_date = utility.get_date_preweek()
+  e_date = utility.get_date_now()
 
   return service.data().ga().get(
       ids='ga:' + profile_id,
-      start_date='2015-04-22',
-      end_date='2015-04-28',
+      start_date=s_date,
+      end_date=e_date,
       metrics='ga:pageviews,ga:avgTimeOnPage',
       dimensions='ga:pageTitle',
       sort='-ga:pageviews',
@@ -320,7 +324,7 @@ def get_audience_info(service, profile_id):
       ids='ga:' + profile_id,
       start_date='2015-04-01',
       end_date='2015-04-28',
-      metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage,a:avgTimeOnSite',
+      metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage',
       dimensions='ga:visitorGender',
       sort='-ga:visits',
       filters='ga:medium==organic',
@@ -385,7 +389,9 @@ def print_pageview_results(results):
       i = 0
       for cell in row:
         if i == 0:
-          cell = cell[:-18]
+          #cell = cell[:-18]
+          #print type(cell)
+          cell = cell.split('|')[0]
         output.append('%30s' % cell)
         i = i + 1
       print ''.join(output)
