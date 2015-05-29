@@ -65,8 +65,11 @@ def main(argv):
       print 'Could not find a valid profile for this user.'
     else:
 
+      results = get_total_metrics(service, cnpolitics_profile_id)
+      utility.print_results(results)
+
       results = get_top_pageviews(service, cnpolitics_profile_id)
-      print_top_pageviews(results)
+      #print_top_pageviews(results)
       
       results = get_top_continents(service, cnpolitics_profile_id)
       #print_results(results)
@@ -135,6 +138,18 @@ def get_cnpolitics_profile_id(service):
 
   return None
 
+
+def get_total_metrics(service, profile_id):
+
+  return service.data().ga().get(
+      ids='ga:' + profile_id,
+      start_date='2015-04-01',
+      end_date='2015-05-18',
+      metrics='ga:visits,ga:sessions',
+      sort='-ga:visits',
+      filters='ga:medium==organic',
+      start_index='1',
+      max_results='25').execute()
 
 def get_top_keywords(service, profile_id):
   """Executes and returns data from the Core Reporting API.
