@@ -79,8 +79,7 @@ def print_results(results):
 def print_top_pageviews(results):
   """Prints out the results.
 
-  This prints out the profile name, the column headers, and all the rows of
-  data.
+  This prints out the top pageviews of different articles.
 
   Args:
     results: The response returned from the Core Reporting API.
@@ -102,17 +101,18 @@ def print_top_pageviews(results):
   else:
     print "No rows Found"
   #print len(data)
-  print max_len
-  print 
-
-  print "%s|%s|  %s" % (myAlign("文章标题",60), myAlign("访问次数".center(10),15), "阅读时间" )
+  #print max_len
+  print "%s|%s|%s" % (unicode_align(u"文章标题",31), unicode_align(u"访问次数",6), unicode_align(u"阅读时间(s)",6))
+  print "==========================================================================================="
   for row in data:
-    pad_len =  70 - str_len(row[0])
+    #pad_len =  70 - str_len(row[0])
     #print str_len(row[0])
     #print ord(u'\u6697') == ord(row[0][0])
     #print "%s|%6s|  %.2f" % (row[0].ljust(80), row[1].center(20), float(row[2]) )
-    print "%s|%6s|  %.2f" % (myAlign(row[0],30), row[1].center(10), float(row[2]) )
-  return
+#    print "%s|%6s|  %.2f" % (myAlign(row[0],30), row[1].center(10), float(row[2]) )
+    print "| %s|%s|%10.2f    |" % (unicode_align_left(row[0],30), row[1].center(12), float(row[2]) )
+    print "-------------------------------------------------------------------------------------------"
+  #return
 
 def filter_page_title(title):
   if title == u"(not set)":
@@ -167,17 +167,68 @@ def str_len(str):
   except:  
     return row_l
 
-def myAlign(string, length=0):
+
+def unicode_align_left(string, length=0):
   if length == 0:
     return string
   slen = len(string)
   re = string
+  half_width_num = 0;
+
   if isinstance(string, str):
     placeholder = ' '
   else:
     placeholder = u'　'
+    
+  """ count number of halfwidth characters for padding """
+  for i in range(slen):
+    if ord(string[i]) < 12200: # not a fully correct solution
+      half_width_num = half_width_num + 1
+
   while slen < length:
     re += placeholder
     slen += 1
+
+  #print half_width_num
+  for i in range(half_width_num):
+    re += ' '
+  return re
+
+def unicode_align(string, length=0):
+  if length == 0:
+    return string
+  slen = len(string)
+  re = ""
+  half_width_num = 0;
+
+  placeholder_num = length - slen
+  if isinstance(string, str):
+    placeholder = ' '
+    for i in range(placeholder_num/2):
+      re += placeholder
+    re += string
+    for i in range(placeholder_num/2, placeholder_num):
+      re += placeholder
+  else:
+    placeholder = u'　'
+
+    """ count number of halfwidth characters for padding """
+    for i in range(slen):
+      if ord(string[i]) < 12200: # not a fully correct solution
+        half_width_num = half_width_num + 1
+    
+    """  pad left  """
+    for i in range(half_width_num):
+      re += ' '
+    for i in range(placeholder_num/2):
+      re += placeholder
+    
+    re += string
+    """  pad right  """
+    for i in range(placeholder_num/2, placeholder_num):
+      re += placeholder
+    for i in range(half_width_num/2, half_width_num):
+      re += ' '
+
   return re
 
