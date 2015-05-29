@@ -75,29 +75,29 @@ def main(argv):
       results = get_usertype_metrics(service, cnpolitics_profile_id, s_date, e_date)
       utility.print_usertype_metrics(results)
 
+      results = get_audience_info(service, cnpolitics_profile_id)
+      utility.print_results(results)
+
       results = get_top_pageviews(service, cnpolitics_profile_id, s_date, e_date)
       utility.print_top_pageviews(results)
       
       results = get_top_continents(service, cnpolitics_profile_id)
-      #print_results(results)
+      utility.print_results(results)
 
       results = get_top_country(service, cnpolitics_profile_id)
-      #utility.print_results(results)
+      utility.print_results(results)
 
       results = get_top_cities(service, cnpolitics_profile_id)
-      #print_results(results)
+      utility.print_results(results)
 
       results = get_top_browsers(service, cnpolitics_profile_id)
-      #print_results(results)
+      utility.print_results(results)
 
       results = get_top_os(service, cnpolitics_profile_id)
-      #print_results(results)
+      utility.print_results(results)
 
       results = get_top_devices(service, cnpolitics_profile_id)
-      #print_results(results)
-
-      results = get_audience_info(service, cnpolitics_profile_id)
-      #print_results(results)
+      utility.print_results(results)
 
   except TypeError, error:
     # Handle errors in constructing a query.
@@ -238,7 +238,6 @@ def get_top_continents(service, profile_id):
       metrics='ga:visits,ga:avgPageLoadTime,ga:avgServerResponseTime',
       dimensions='ga:continent',
       sort='-ga:visits',
-      filters='ga:medium==organic',
       start_index='1',
       max_results='7').execute()
 
@@ -286,7 +285,7 @@ def get_top_cities(service, profile_id):
       metrics='ga:visits,ga:avgPageLoadTime,ga:avgServerResponseTime',
       dimensions='ga:city',
       sort='-ga:visits',
-      filters='ga:medium==organic',
+      #filters='ga:medium==organic',
       start_index='1',
       max_results='10').execute()
 
@@ -310,7 +309,6 @@ def get_top_browsers(service, profile_id):
       metrics='ga:visits',
       dimensions='ga:browser',
       sort='-ga:visits',
-      filters='ga:medium==organic',
       start_index='1',
       max_results='5').execute()
 
@@ -334,7 +332,6 @@ def get_top_os(service, profile_id):
       metrics='ga:visits',
       dimensions='ga:operatingSystem',
       sort='-ga:visits',
-      filters='ga:medium==organic',
       start_index='1',
       max_results='5').execute()
 
@@ -358,7 +355,6 @@ def get_top_devices(service, profile_id):
       metrics='ga:visits',
       dimensions='ga:mobileDeviceModel',
       sort='-ga:visits',
-      filters='ga:medium==organic',
       start_index='1',
       max_results='10').execute()
 
@@ -382,7 +378,7 @@ def get_audience_info(service, profile_id):
       metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage',
       dimensions='ga:visitorGender',
       sort='-ga:visits',
-      filters='ga:medium==organic',
+      #filters='ga:medium==organic',
       start_index='1',
       max_results='10').execute()
 

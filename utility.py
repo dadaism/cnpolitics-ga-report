@@ -100,16 +100,10 @@ def print_top_pageviews(results):
           max_len = len(row[0])
   else:
     print "No rows Found"
-  #print len(data)
-  #print max_len
-  print "%s|%s|%s" % (unicode_align(u"文章标题",31), unicode_align(u"访问次数",6), unicode_align(u"阅读时间(s)",6))
+
+  print "%s|%s|%s" % (unicode_align_center(u"文章标题",31), unicode_align_center(u"访问次数",6), unicode_align_center(u"阅读时间(s)",6))
   print "==========================================================================================="
   for row in data:
-    #pad_len =  70 - str_len(row[0])
-    #print str_len(row[0])
-    #print ord(u'\u6697') == ord(row[0][0])
-    #print "%s|%6s|  %.2f" % (row[0].ljust(80), row[1].center(20), float(row[2]) )
-#    print "%s|%6s|  %.2f" % (myAlign(row[0],30), row[1].center(10), float(row[2]) )
     print "| %s|%s|%10.2f    |" % (unicode_align_left(row[0],30), row[1].center(12), float(row[2]) )
     print "-------------------------------------------------------------------------------------------"
   #return
@@ -194,7 +188,7 @@ def unicode_align_left(string, length=0):
     re += ' '
   return re
 
-def unicode_align(string, length=0):
+def unicode_align_center(string, length=0):
   if length == 0:
     return string
   slen = len(string)
