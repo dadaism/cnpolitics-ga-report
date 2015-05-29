@@ -1,8 +1,10 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # import required classes
 import datetime
 from datetime import timedelta
+from tabulate import tabulate
 
 def get_date_now():
 	return datetime.datetime.now().strftime("%Y-%m-%d")
@@ -10,6 +12,38 @@ def get_date_now():
 def get_date_preweek():
 	lastHourDateTime = datetime.datetime.now() - timedelta(days = 7)
 	return lastHourDateTime.strftime("%Y-%m-%d")
+
+def print_total_metrics(results):
+  """Prints out the results.
+
+  This prints out the profile name, the column headers, and all the rows of
+  data.
+
+  Args:
+    results: The response returned from the Core Reporting API.
+  """
+
+  data = results.get('rows')
+  print 
+  print "日均访问人数: ", int(data[0][0])/7
+  print "日均页面访问数: ", int(data[0][1])/7
+  second = float(data[0][3])/float(data[0][2])
+  print "人均网站停留时间: %d分%d秒" % (second/60, second%60)
+
+def print_usertype_metrics(results):
+  """Prints out the results.
+
+  This prints out the profile name, the column headers, and all the rows of
+  data.
+
+  Args:
+    results: The response returned from the Core Reporting API.
+  """
+
+  #print results.get('rows')[0]
+  print "初次访问总人数: ", int(results.get('rows')[0][1])
+  print "非初次访问总人数: ", int(results.get('rows')[1][1])
+  #print tabulate(results.get('rows'))
 
 def print_results(results):
   """Prints out the results.
@@ -42,7 +76,7 @@ def print_results(results):
   else:
     print 'No Rows Found'
 
-def print_pageview_results(results):
+def print_top_pageviews(results):
   """Prints out the results.
 
   This prints out the profile name, the column headers, and all the rows of
@@ -51,30 +85,99 @@ def print_pageview_results(results):
   Args:
     results: The response returned from the Core Reporting API.
   """
+  #print tabulate(results.get('rows'), headers=["page title","page view", "time on page"], tablefmt="grid" )
 
-  print
-  print 'Profile Name: %s' % results.get('profileInfo').get('profileName')
-  print
-
-  # Print header.
-  output = []
-  for header in results.get('columnHeaders'):
-    output.append('%30s' % header.get('name'))
-  print ''.join(output)
-
-  # Print data table.
-  if results.get('rows', []):
+  data = []
+  print 
+  max_len = 0
+  if results.get('rows'):
     for row in results.get('rows'):
-      output = []
-      i = 0
-      for cell in row:
-        if i == 0:
-          #cell = cell[:-18]
-          #print type(cell)
-          cell = cell.split('|')[0]
-        output.append('%30s' % cell)
-        i = i + 1
-      print ''.join(output)
-
+      #print "processing ", row[0]
+      row[0] = row[0].split('|')[0]
+      row[0] = row[0].strip()
+      if filter_page_title(row[0]) == False:
+        data.append(row)
+        if max_len < len(row[0]):
+          max_len = len(row[0])
   else:
-    print 'No Rows Found'
+    print "No rows Found"
+  #print len(data)
+  print max_len
+  print 
+
+  print "%s|%s|  %s" % (myAlign("文章标题",60), myAlign("访问次数".center(10),15), "阅读时间" )
+  for row in data:
+    pad_len =  70 - str_len(row[0])
+    #print str_len(row[0])
+    #print ord(u'\u6697') == ord(row[0][0])
+    #print "%s|%6s|  %.2f" % (row[0].ljust(80), row[1].center(20), float(row[2]) )
+    print "%s|%6s|  %.2f" % (myAlign(row[0],30), row[1].center(10), float(row[2]) )
+  return
+
+def filter_page_title(title):
+  if title == u"(not set)":
+    return True
+  if title == u"团队成员":
+    return True
+  if title == u"全部政见":
+    return True
+  elif title == u"政见 CNPolitics.org - 发掘海内外研究中国政治的智慧成果，引进思想资源":
+    return True
+  elif title == u"政见合辑下载":
+    return True
+  elif title == u"读图识政治":
+    return True
+  elif title == u"民主制度":
+    return True
+  elif title == u"研究速览":
+    return True
+  elif title == u"政府治理":
+    return True
+  elif title == u"张跃然":
+    return True
+  else:
+    return False
+
+def str_len(str):  
+  simbol_len = 0;
+  try:  
+    row_l=len(str)  
+    utf8_l=len(str.encode('utf-8'))
+    for i in range(len(str)):
+      """
+        65311: ?
+        65306: :
+        8220:“
+        8221:”
+        65292:，
+        12289:、
+        65288:（
+        65289:）
+        12304:【
+        12305:】
+      """
+      #if ord(str[i])==65311 or ord(str[i])==65306 or ord(str[i])==8220 or ord(str[i])==8221 \
+      #      or ord(str[i])==65292 or ord(str[i])==12289 or ord(str[i])==65288 or ord(str[i])==65289 \
+      #      or ord(str[i])==12304 or ord(str[i])==12305 :
+        #print ord(u'\u4e00'), ord(str[i]), ord(u'\u9520'), str[i]
+      #  simbol_len = simbol_len + 1
+    #print "Total simbol: ", simbol_len
+    #print "Original length: ", (utf8_l-row_l)/2+row_l
+    return (utf8_l-row_l)/2+row_l#-simbol_len
+  except:  
+    return row_l
+
+def myAlign(string, length=0):
+  if length == 0:
+    return string
+  slen = len(string)
+  re = string
+  if isinstance(string, str):
+    placeholder = ' '
+  else:
+    placeholder = u'　'
+  while slen < length:
+    re += placeholder
+    slen += 1
+  return re
+

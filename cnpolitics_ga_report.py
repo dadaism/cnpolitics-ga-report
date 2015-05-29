@@ -52,6 +52,10 @@ from oauth2client.client import AccessTokenRefreshError
 
 
 def main(argv):
+  s_date = utility.get_date_preweek()
+  e_date = utility.get_date_now()
+  print "\t政见网站运营报告\n （", s_date, '至', e_date, "）"
+
   service = cnpolitics_ga_report_auth.initialize_service()
   # Authenticate and construct service.
   #service, flags = sample_tools.init(
@@ -65,14 +69,20 @@ def main(argv):
       print 'Could not find a valid profile for this user.'
     else:
 
-      results = get_total_metrics(service, cnpolitics_profile_id)
-      utility.print_results(results)
+      results = get_total_metrics(service, cnpolitics_profile_id, s_date, e_date)
+      utility.print_total_metrics(results)
 
-      results = get_top_pageviews(service, cnpolitics_profile_id)
-      #print_top_pageviews(results)
+      results = get_usertype_metrics(service, cnpolitics_profile_id, s_date, e_date)
+      utility.print_usertype_metrics(results)
+
+      results = get_top_pageviews(service, cnpolitics_profile_id, s_date, e_date)
+      utility.print_top_pageviews(results)
       
       results = get_top_continents(service, cnpolitics_profile_id)
       #print_results(results)
+
+      results = get_top_country(service, cnpolitics_profile_id)
+      #utility.print_results(results)
 
       results = get_top_cities(service, cnpolitics_profile_id)
       #print_results(results)
@@ -139,15 +149,25 @@ def get_cnpolitics_profile_id(service):
   return None
 
 
-def get_total_metrics(service, profile_id):
+def get_total_metrics(service, profile_id, s_date, e_date):
 
   return service.data().ga().get(
       ids='ga:' + profile_id,
-      start_date='2015-04-01',
-      end_date='2015-05-18',
-      metrics='ga:visits,ga:sessions',
+      start_date=s_date,
+      end_date=e_date,
+      metrics='ga:visits,ga:pageviews,ga:sessions,ga:sessionDuration',
       sort='-ga:visits',
-      filters='ga:medium==organic',
+      start_index='1',
+      max_results='25').execute()
+
+def get_usertype_metrics(service, profile_id, s_date, e_date):
+
+  return service.data().ga().get(
+      ids='ga:' + profile_id,
+      start_date=s_date,
+      end_date=e_date,
+      dimensions='ga:userType',
+      metrics='ga:sessions',
       start_index='1',
       max_results='25').execute()
 
@@ -175,7 +195,7 @@ def get_top_keywords(service, profile_id):
       start_index='1',
       max_results='25').execute()
 
-def get_top_pageviews(service, profile_id):
+def get_top_pageviews(service, profile_id, s_date, e_date):
   """Executes and returns data from the Core Reporting API.
 
   This queries the API for the top 25 organic search terms by visits.
@@ -187,8 +207,6 @@ def get_top_pageviews(service, profile_id):
   Returns:
     The response returned from the Core Reporting API.
   """
-  s_date = utility.get_date_preweek()
-  e_date = utility.get_date_now()
 
   return service.data().ga().get(
       ids='ga:' + profile_id,
@@ -197,9 +215,8 @@ def get_top_pageviews(service, profile_id):
       metrics='ga:pageviews,ga:avgTimeOnPage',
       dimensions='ga:pageTitle',
       sort='-ga:pageviews',
-      filters='ga:medium==organic',
       start_index='1',
-      max_results='30').execute()
+      max_results='20').execute()
 
 def get_top_continents(service, profile_id):
   """Executes and returns data from the Core Reporting API.
@@ -222,6 +239,30 @@ def get_top_continents(service, profile_id):
       dimensions='ga:continent',
       sort='-ga:visits',
       filters='ga:medium==organic',
+      start_index='1',
+      max_results='7').execute()
+
+def get_top_country(service, profile_id):
+  """Executes and returns data from the Core Reporting API.
+
+  This queries the API for the top 25 organic search terms by visits.
+
+  Args:
+    service: The service object built by the Google API Python client library.
+    profile_id: String The profile ID from which to retrieve analytics data.
+
+  Returns:
+    The response returned from the Core Reporting API.
+  """
+
+  return service.data().ga().get(
+      ids='ga:' + profile_id,
+      start_date='2015-04-01',
+      end_date='2015-04-28',
+      metrics='ga:visits,ga:avgPageLoadTime,ga:avgServerResponseTime',
+      dimensions='ga:country',
+      sort='-ga:visits',
+      #filters='ga:medium==organic',
       start_index='1',
       max_results='7').execute()
 
