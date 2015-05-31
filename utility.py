@@ -226,3 +226,95 @@ def unicode_align_center(string, length=0):
 
   return re
 
+def print_top_continents(results):
+  """Prints out the results.
+
+  This prints out the profile name, the column headers, and all the rows of
+  data.
+
+  Args:
+    results: The response returned from the Core Reporting API.
+  """
+
+  print
+  print 'Profile Name: %s' % results.get('profileInfo').get('profileName')
+  print
+
+  # Print header.
+  output = []
+  for header in results.get('columnHeaders'):
+    output.append('%30s' % header.get('name'))
+  print ''.join(output)
+
+  # Print data table.
+  if results.get('rows', []):
+    for row in results.get('rows'):
+      output = []
+      for cell in row:
+        output.append('%30s' % cell)
+      print ''.join(output)
+
+  else:
+    print 'No Rows Found'
+
+def print_top_country(results):
+  """Prints out the results.
+
+  This prints out the profile name, the column headers, and all the rows of
+  data.
+
+  Args:
+    results: The response returned from the Core Reporting API.
+  """
+
+  print
+  print 'Profile Name: %s' % results.get('profileInfo').get('profileName')
+  print
+
+  # Print header.
+  output = []
+  for header in results.get('columnHeaders'):
+    output.append('%30s' % header.get('name'))
+  print ''.join(output)
+
+  # Print data table.
+  if results.get('rows', []):
+    for row in results.get('rows'):
+      output = []
+      for cell in row:
+        output.append('%30s' % cell)
+      print ''.join(output)
+
+  else:
+    print 'No Rows Found'
+
+def print_top_cities(results):
+  """Prints out the results.
+
+  This prints out the profile name, the column headers, and all the rows of
+  data.
+
+  Args:
+    results: The response returned from the Core Reporting API.
+  """
+
+  print
+  print 'Profile Name: %s' % results.get('profileInfo').get('profileName')
+  print
+
+  # Print header.
+  output = []
+  for header in results.get('columnHeaders'):
+    output.append('%30s' % header.get('name'))
+  print ''.join(output)
+
+  # Print data table.
+  if results.get('rows', []):
+    for row in results.get('rows'):
+      output = []
+      for cell in row:
+        output.append('%30s' % cell)
+      print ''.join(output)
+
+  else:
+    print 'No Rows Found'
