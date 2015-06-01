@@ -55,6 +55,7 @@ def main(argv):
   s_date = utility.get_date_preweek()
   e_date = utility.get_date_now()
   print "\t政见网站运营报告\n （", s_date, '至', e_date, "）"
+  print
 
   service = cnpolitics_ga_report_auth.initialize_service()
   # Authenticate and construct service.
@@ -69,18 +70,32 @@ def main(argv):
       print 'Could not find a valid profile for this user.'
     else:
 
+      print '一、总览'
       results = get_total_metrics(service, cnpolitics_profile_id, s_date, e_date)
       utility.print_total_metrics(results)
 
       results = get_usertype_metrics(service, cnpolitics_profile_id, s_date, e_date)
       utility.print_usertype_metrics(results)
 
-      results = get_audience_info(service, cnpolitics_profile_id)
-      utility.print_results(results)
+      print
+      print '二、读者'
 
-      results = get_top_pageviews(service, cnpolitics_profile_id, s_date, e_date)
-      utility.print_top_pageviews(results)
-      
+      results = get_audience_info(service, cnpolitics_profile_id, s_date, e_date)
+      utility.print_audience_info(results)
+
+      """
+      results = service.data().ga().get(
+      ids='ga:' + cnpolitics_profile_id,
+      start_date=s_date,
+      end_date=e_date,
+      metrics='ga:visits',
+      dimensions='ga:visitorGender',
+      sort='-ga:visits',
+      start_index='1',
+      max_results='10').execute()
+      utility.print_results(results)
+      """
+
       results = get_top_continents(service, cnpolitics_profile_id, s_date, e_date)
       utility.print_top_continents(results)
 
@@ -89,15 +104,20 @@ def main(argv):
 
       results = get_top_cities(service, cnpolitics_profile_id, s_date, e_date)
       utility.print_top_cities(results)
+      #utility.print_results(results)
 
-#      results = get_top_browsers(service, cnpolitics_profile_id)
-#      utility.print_results(results)
+      print '三、内容'
+      results = get_top_pageviews(service, cnpolitics_profile_id, s_date, e_date)
+      utility.print_top_pageviews(results)
 
-#      results = get_top_os(service, cnpolitics_profile_id)
-#      utility.print_results(results)
+      #results = get_top_browsers(service, cnpolitics_profile_id, s_date, e_date)
+      #utility.print_results(results)
 
-#      results = get_top_devices(service, cnpolitics_profile_id)
-#      utility.print_results(results)
+      #results = get_top_os(service, cnpolitics_profile_id, s_date, e_date)
+      #utility.print_results(results)
+
+      #results = get_top_devices(service, cnpolitics_profile_id, s_date, e_date)
+      #utility.print_results(results)
 
   except TypeError, error:
     # Handle errors in constructing a query.
@@ -235,11 +255,12 @@ def get_top_continents(service, profile_id, s_date, e_date):
       ids='ga:' + profile_id,
       start_date=s_date,
       end_date=e_date,
-      metrics='ga:visits,ga:avgPageLoadTime,ga:avgServerResponseTime',
+      metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage,ga:sessions,ga:sessionDuration',
+      #metrics='ga:visits,ga:avgPageLoadTime,ga:avgServerResponseTime',
       dimensions='ga:continent',
       sort='-ga:visits',
       start_index='1',
-      max_results='7').execute()
+      max_results='10').execute()
 
 def get_top_country(service, profile_id, s_date, e_date):
   """Executes and returns data from the Core Reporting API.
@@ -258,12 +279,12 @@ def get_top_country(service, profile_id, s_date, e_date):
       ids='ga:' + profile_id,
       start_date=s_date,
       end_date=e_date,
-      metrics='ga:visits,ga:avgPageLoadTime,ga:avgServerResponseTime',
+      metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage,ga:sessions,ga:sessionDuration',
       dimensions='ga:country',
       sort='-ga:visits',
       #filters='ga:medium==organic',
       start_index='1',
-      max_results='7').execute()
+      max_results='10').execute()
 
 def get_top_cities(service, profile_id, s_date, e_date):
   """Executes and returns data from the Core Reporting API.
@@ -282,14 +303,14 @@ def get_top_cities(service, profile_id, s_date, e_date):
       ids='ga:' + profile_id,
       start_date=s_date,
       end_date=e_date,
-      metrics='ga:visits,ga:avgPageLoadTime,ga:avgServerResponseTime',
+      metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage,ga:sessions,ga:sessionDuration',
       dimensions='ga:city',
       sort='-ga:visits',
       #filters='ga:medium==organic',
       start_index='1',
       max_results='10').execute()
 
-def get_top_browsers(service, profile_id):
+def get_top_browsers(service, profile_id, s_date, e_date):
   """Executes and returns data from the Core Reporting API.
 
   This queries the API for the top 25 organic search terms by visits.
@@ -304,15 +325,15 @@ def get_top_browsers(service, profile_id):
 
   return service.data().ga().get(
       ids='ga:' + profile_id,
-      start_date='2015-04-01',
-      end_date='2015-04-28',
+      start_date=s_date,
+      end_date=e_date,
       metrics='ga:visits',
       dimensions='ga:browser',
       sort='-ga:visits',
       start_index='1',
       max_results='5').execute()
 
-def get_top_os(service, profile_id):
+def get_top_os(service, profile_id, s_date, e_date):
   """Executes and returns data from the Core Reporting API.
 
   This queries the API for the top 25 organic search terms by visits.
@@ -327,15 +348,15 @@ def get_top_os(service, profile_id):
 
   return service.data().ga().get(
       ids='ga:' + profile_id,
-      start_date='2015-04-01',
-      end_date='2015-04-28',
+      start_date=s_date,
+      end_date=e_date,
       metrics='ga:visits',
       dimensions='ga:operatingSystem',
       sort='-ga:visits',
       start_index='1',
       max_results='5').execute()
 
-def get_top_devices(service, profile_id):
+def get_top_devices(service, profile_id, s_date, e_date):
   """Executes and returns data from the Core Reporting API.
 
   This queries the API for the top 25 organic search terms by visits.
@@ -350,15 +371,15 @@ def get_top_devices(service, profile_id):
 
   return service.data().ga().get(
       ids='ga:' + profile_id,
-      start_date='2015-04-01',
-      end_date='2015-04-28',
+      start_date=s_date,
+      end_date=e_date,
       metrics='ga:visits',
       dimensions='ga:mobileDeviceModel',
       sort='-ga:visits',
       start_index='1',
       max_results='10').execute()
 
-def get_audience_info(service, profile_id):
+def get_audience_info(service, profile_id, s_date, e_date):
   """Executes and returns data from the Core Reporting API.
 
   This queries the API for the top 25 organic search terms by visits.
@@ -373,9 +394,9 @@ def get_audience_info(service, profile_id):
 
   return service.data().ga().get(
       ids='ga:' + profile_id,
-      start_date='2015-04-01',
-      end_date='2015-04-28',
-      metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage',
+      start_date=s_date,
+      end_date=e_date,
+      metrics='ga:visits,ga:pageviews,ga:avgTimeOnPage,ga:sessions,ga:sessionDuration,ga:bounceRate',
       dimensions='ga:visitorGender',
       sort='-ga:visits',
       #filters='ga:medium==organic',

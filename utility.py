@@ -6,6 +6,8 @@ import datetime
 from datetime import timedelta
 from tabulate import tabulate
 
+total_visit = 0
+
 def get_date_now():
 	return datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -24,6 +26,9 @@ def print_total_metrics(results):
   """
 
   data = results.get('rows')
+
+  total_visit = data[0][0]
+
   print 
   print "日均访问人数: ", int(data[0][0])/7
   print "日均页面访问数: ", int(data[0][1])/7
@@ -87,7 +92,8 @@ def print_top_pageviews(results):
   #print tabulate(results.get('rows'), headers=["page title","page view", "time on page"], tablefmt="grid" )
 
   data = []
-  print 
+  print
+  print '阅读量靠前的文章'
   max_len = 0
   if results.get('rows'):
     for row in results.get('rows'):
@@ -101,12 +107,12 @@ def print_top_pageviews(results):
   else:
     print "No rows Found"
 
-  print "%s|%s|%s" % (unicode_align_center(u"文章标题",31), unicode_align_center(u"访问次数",6), unicode_align_center(u"阅读时间(s)",6))
+  print "%s|%s|%s" % (unicode_align_center(u"文章标题",31), unicode_align_center(u"阅读次数",6), unicode_align_center(u"阅读时间(s)",6))
   print "==========================================================================================="
   for row in data:
     print "| %s|%s|%10.2f    |" % (unicode_align_left(row[0],30), row[1].center(12), float(row[2]) )
     print "-------------------------------------------------------------------------------------------"
-  #return
+  return
 
 def filter_page_title(title):
   if title == u"(not set)":
@@ -226,6 +232,35 @@ def unicode_align_center(string, length=0):
 
   return re
 
+def print_audience_info(results):
+  """Prints out the results.
+
+  This prints out the profile name, the column headers, and all the rows of
+  data.
+
+  Args:
+    results: The response returned from the Core Reporting API.
+  """
+
+  print
+  print '可统计的男女读者对比'
+
+  data = []
+  print 
+
+  if results.get('rows'):
+    data = results.get('rows')
+  else:
+    print "No rows Found"
+
+  print "%s|%s|%s|%s|%s" % (unicode_align_center(u"性别",5), unicode_align_center(u"人数",5), unicode_align_center(u"文章阅读数",7), unicode_align_center(u"平均阅读时间(s)",6), unicode_align_center(u"平均站点停留时间(s)",6))
+  print "===================================================================================="
+  for row in data:
+    print "%s|%s|%s|%14.2f      |%16.2f         |" % ( row[0].center(10), row[1].center(10), row[2].center(14), float(row[3]), float(row[5])/float(row[4]) )
+    print "------------------------------------------------------------------------------------"
+  
+  print
+  
 def print_top_continents(results):
   """Prints out the results.
 
@@ -237,25 +272,26 @@ def print_top_continents(results):
   """
 
   print
-  print 'Profile Name: %s' % results.get('profileInfo').get('profileName')
-  print
+  print '不同洲读者对比'
 
-  # Print header.
-  output = []
-  for header in results.get('columnHeaders'):
-    output.append('%30s' % header.get('name'))
-  print ''.join(output)
+  data = []
+  print 
 
-  # Print data table.
-  if results.get('rows', []):
-    for row in results.get('rows'):
-      output = []
-      for cell in row:
-        output.append('%30s' % cell)
-      print ''.join(output)
-
+  if results.get('rows'):
+    data = results.get('rows')
   else:
-    print 'No Rows Found'
+    print "No rows Found"
+
+  print "%s|%s|%s|%s|%s" % (unicode_align_center(u"洲",5), unicode_align_center(u"人数",5), unicode_align_center(u"文章阅读数",7), unicode_align_center(u"平均阅读时间(s)",6), unicode_align_center(u"平均站点停留时间(s)",6))
+  print "===================================================================================="
+  for row in data:
+    if row[0] == u"(not set)":
+      continue
+    print "%s|%s|%s|%14.2f      |%16.2f         |" % ( row[0].center(10), row[1].center(10), row[2].center(14), float(row[3]), float(row[5])/float(row[4]) )
+    print "------------------------------------------------------------------------------------"
+  
+  print
+  
 
 def print_top_country(results):
   """Prints out the results.
@@ -268,25 +304,26 @@ def print_top_country(results):
   """
 
   print
-  print 'Profile Name: %s' % results.get('profileInfo').get('profileName')
-  print
+  print '不同国家地区读者对比'
 
-  # Print header.
-  output = []
-  for header in results.get('columnHeaders'):
-    output.append('%30s' % header.get('name'))
-  print ''.join(output)
+  data = []
+  print 
 
-  # Print data table.
-  if results.get('rows', []):
-    for row in results.get('rows'):
-      output = []
-      for cell in row:
-        output.append('%30s' % cell)
-      print ''.join(output)
-
+  if results.get('rows'):
+    data = results.get('rows')
   else:
-    print 'No Rows Found'
+    print "No rows Found"
+
+  print "%s|%s|%s|%s|%s" % (unicode_align_center(u"国家地区",8), unicode_align_center(u"人数",5), unicode_align_center(u"文章阅读数",7), unicode_align_center(u"平均阅读时间(s)",6), unicode_align_center(u"平均站点停留时间(s)",6))
+  print "=========================================================================================="
+  for row in data:
+    if row[0] == u"(not set)":
+      continue
+    print "%s|%s|%s|%14.2f      |%16.2f         |" % ( row[0].center(16), row[1].center(10), row[2].center(14), float(row[3]), float(row[5])/float(row[4]) )
+    print "------------------------------------------------------------------------------------------"
+  
+  print
+  
 
 def print_top_cities(results):
   """Prints out the results.
@@ -299,22 +336,24 @@ def print_top_cities(results):
   """
 
   print
-  print 'Profile Name: %s' % results.get('profileInfo').get('profileName')
-  print
+  print '不同城市读者对比'
 
-  # Print header.
-  output = []
-  for header in results.get('columnHeaders'):
-    output.append('%30s' % header.get('name'))
-  print ''.join(output)
+  data = []
+  print 
 
-  # Print data table.
-  if results.get('rows', []):
-    for row in results.get('rows'):
-      output = []
-      for cell in row:
-        output.append('%30s' % cell)
-      print ''.join(output)
-
+  if results.get('rows'):
+    data = results.get('rows')
   else:
-    print 'No Rows Found'
+    print "No rows Found"
+
+  print "%s|%s|%s|%s|%s" % (unicode_align_center(u"性别",5), unicode_align_center(u"人数",5), unicode_align_center(u"文章阅读数",7), unicode_align_center(u"平均阅读时间(s)",6), unicode_align_center(u"平均站点停留时间(s)",6))
+  print "===================================================================================="
+  for row in data:
+    if row[0] == u"(not set)":
+      continue
+    print "%s|%s|%s|%14.2f      |%16.2f         |" % ( row[0].center(10), row[1].center(10), row[2].center(14), float(row[3]), float(row[5])/float(row[4]) )
+    print "------------------------------------------------------------------------------------"
+  
+  print
+  
+
